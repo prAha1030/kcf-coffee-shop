@@ -1,0 +1,10 @@
+spring:
+  profiles:
+    active: prod
+  jpa:
+    properties:
+      hibernate:
+        format_sql: true
+
+jwt:
+  expiration: 86400000
