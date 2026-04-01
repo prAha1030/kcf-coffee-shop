@@ -20,7 +20,7 @@ public class PointLog extends BaseEntity {
     private Long id;
 
     @Column(nullable = false)
-    private Long point_id;
+    private Long pointId;
 
     @Column(nullable = false)
     private BigDecimal amount;
