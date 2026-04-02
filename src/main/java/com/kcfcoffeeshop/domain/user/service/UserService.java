@@ -1,12 +1,13 @@
 package com.kcfcoffeeshop.domain.user.service;
 
+import com.kcfcoffeeshop.common.exception.BusinessException;
 import com.kcfcoffeeshop.domain.point.entity.Point;
 import com.kcfcoffeeshop.domain.point.repository.PointRepository;
 import com.kcfcoffeeshop.domain.user.dto.request.UserSignupRequest;
 import com.kcfcoffeeshop.domain.user.dto.response.UserSignupResponse;
 import com.kcfcoffeeshop.domain.user.entity.User;
+import com.kcfcoffeeshop.domain.user.enums.UserErrorCode;
 import com.kcfcoffeeshop.domain.user.repository.UserRepository;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -23,7 +24,10 @@ public class UserService {
     @Transactional
     public UserSignupResponse userSignup(UserSignupRequest request) {
 
-        // TODO 이메일 중복 검증
+        // 이메일 중복 확인
+        if (userRepository.existsByEmail(request.email())) {
+            throw new BusinessException(UserErrorCode.ERR_USER_DUPLICATED_EMAIL);
+        }
 
         // 비밀번호 암호화
         String encodedPassword = passwordEncoder.encode(request.password());
