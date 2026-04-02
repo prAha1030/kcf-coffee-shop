@@ -1,6 +1,7 @@
 package com.kcfcoffeeshop.domain.user.entity;
 
 import com.kcfcoffeeshop.common.entity.BaseEntity;
+import com.kcfcoffeeshop.domain.user.dto.request.UserSignupRequest;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -37,4 +38,14 @@ public class User extends BaseEntity {
     private LocalDateTime updatedAt;
 
     private LocalDateTime deletedAt;
+
+    public static User create(UserSignupRequest request, String encodedPassword) {
+        User user = new User();
+        user.name = request.name();
+        user.email = request.email();
+        user.password = encodedPassword;
+        user.phoneNumber = request.phoneNumber();
+        user.address = request.address();
+        return user;
+    }
 }
