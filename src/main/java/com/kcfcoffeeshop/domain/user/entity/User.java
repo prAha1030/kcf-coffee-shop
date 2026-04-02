@@ -2,6 +2,7 @@ package com.kcfcoffeeshop.domain.user.entity;
 
 import com.kcfcoffeeshop.common.entity.BaseEntity;
 import com.kcfcoffeeshop.domain.user.dto.request.UserSignupRequest;
+import com.kcfcoffeeshop.domain.user.enums.UserRole;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -34,6 +35,10 @@ public class User extends BaseEntity {
 
     private String address;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private UserRole role;
+
     @LastModifiedDate
     private LocalDateTime updatedAt;
 
@@ -46,6 +51,7 @@ public class User extends BaseEntity {
         user.password = encodedPassword;
         user.phoneNumber = request.phoneNumber();
         user.address = request.address();
+        user.role = UserRole.USER;
         return user;
     }
 }
