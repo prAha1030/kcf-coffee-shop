@@ -23,4 +23,11 @@ public class Point extends BaseEntity {
 
     @Column(nullable = false)
     private BigDecimal balance;
+
+    public static Point create(Long userId) {
+        Point point = new Point();
+        point.userId = userId;
+        point.balance = BigDecimal.ZERO;
+        return point;
+    }
 }
