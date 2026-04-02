@@ -14,9 +14,9 @@ import java.util.List;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    // 여러 도메인 에러들을 관리하는 ServiceException 처리
-    @ExceptionHandler(ServiceException.class)
-    public ResponseEntity<BaseResponse<Void>> handleServiceException(ServiceException e) {
+    // 여러 도메인 에러들을 관리하는 BusinessException 처리
+    @ExceptionHandler(BusinessException.class)
+    public ResponseEntity<BaseResponse<Void>> handleBusinessException(BusinessException e) {
         log.error("서비스 에러 발생 : {}, 에러 상세 내용 : ", e.getMessage(), e);
         return ResponseEntity.status(e.getHttpStatus()).body(
                 BaseResponse.fail(e.getHttpStatus(), e.getMessage())
