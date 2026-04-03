@@ -1,15 +1,20 @@
 package com.kcfcoffeeshop.common.config.security;
 
 import com.kcfcoffeeshop.domain.user.enums.UserRole;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class JwtUtil {
@@ -41,5 +46,25 @@ public class JwtUtil {
                 .expiration(new Date(now.getTime() + jwtProperties.refreshExpiration()))
                 .signWith(getSigningKey())
                 .compact();
+    }
+
+    // token 검증
+    public boolean validateToken(String token) {
+        try {
+            Jwts.parser()
+                    .verifyWith(getSigningKey())
+                    .build()
+                    .parseSignedClaims(token);
+            return true;
+        } catch (ExpiredJwtException e) {
+            log.info("만료된 JWT 토큰입니다 : {}", e.getMessage());
+        } catch (UnsupportedJwtException e) {
+            log.info("지원하지 않는 JWT 토큰입니다 : {}", e.getMessage());
+        } catch (MalformedJwtException e) {
+            log.info("잘못된 JWT 토큰입니다 : {}", e.getMessage());
+        } catch (IllegalArgumentException e) {
+            log.info("JWT 토큰이 비어있습니다 : {}", e.getMessage());
+        }
+        return false;
     }
 }
