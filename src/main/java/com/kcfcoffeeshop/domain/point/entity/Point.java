@@ -30,4 +30,8 @@ public class Point extends BaseEntity {
         point.balance = BigDecimal.ZERO;
         return point;
     }
+
+    public void charge(BigDecimal amount) {
+        this.balance = this.balance.add(amount);
+    }
 }
