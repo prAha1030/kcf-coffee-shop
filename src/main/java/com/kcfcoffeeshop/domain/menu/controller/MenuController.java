@@ -1,6 +1,7 @@
 package com.kcfcoffeeshop.domain.menu.controller;
 
 import com.kcfcoffeeshop.common.dto.BaseResponse;
+import com.kcfcoffeeshop.common.dto.PageResponse;
 import com.kcfcoffeeshop.domain.menu.dto.response.MenuListGetResponse;
 import com.kcfcoffeeshop.domain.menu.service.MenuService;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +22,7 @@ public class MenuController {
     private final MenuService menuService;
 
     @GetMapping
-    public ResponseEntity<BaseResponse<MenuListGetResponse>> getMenuList(
+    public ResponseEntity<BaseResponse<PageResponse<MenuListGetResponse>>> getMenuList(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
