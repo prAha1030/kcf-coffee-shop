@@ -1,7 +1,9 @@
 package com.kcfcoffeeshop.domain.user.controller;
 
 import com.kcfcoffeeshop.common.dto.BaseResponse;
+import com.kcfcoffeeshop.domain.user.dto.request.UserLoginRequest;
 import com.kcfcoffeeshop.domain.user.dto.request.UserSignupRequest;
+import com.kcfcoffeeshop.domain.user.dto.response.UserLoginResponse;
 import com.kcfcoffeeshop.domain.user.dto.response.UserSignupResponse;
 import com.kcfcoffeeshop.domain.user.service.UserService;
 import jakarta.validation.Valid;
@@ -24,6 +26,13 @@ public class UserController {
     public ResponseEntity<BaseResponse<UserSignupResponse>> userSignup(@Valid @RequestBody UserSignupRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(
                 BaseResponse.success(HttpStatus.CREATED, "회원가입 성공", userService.userSignup(request))
+        );
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<BaseResponse<UserLoginResponse>> userLogin(@Valid @RequestBody UserLoginRequest request) {
+        return ResponseEntity.status(HttpStatus.OK).body(
+                BaseResponse.success(HttpStatus.OK, "로그인 성공", userService.userLogin(request))
         );
     }
 }
