@@ -1,10 +1,7 @@
 package com.kcfcoffeeshop.common.config.security;
 
 import com.kcfcoffeeshop.domain.user.enums.UserRole;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.MalformedJwtException;
-import io.jsonwebtoken.UnsupportedJwtException;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,6 +28,7 @@ public class JwtUtil {
         Date now = new Date();
         return Jwts.builder()
                 .subject(String.valueOf(userId))
+                .claim("email", email)
                 .claim("role", role.name())
                 .issuedAt(now)
                 .expiration(new Date(now.getTime() + jwtProperties.accessExpiration()))
@@ -66,5 +64,29 @@ public class JwtUtil {
             log.info("JWT 토큰이 비어있습니다 : {}", e.getMessage());
         }
         return false;
+    }
+
+    // claims 추출
+    private Claims getClaims(String token) {
+        return Jwts.parser()
+                .verifyWith(getSigningKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+    }
+
+    // userId 추출
+    public Long getUserId(String token) {
+        return Long.parseLong(getClaims(token).getSubject());
+    }
+
+    // email 추출
+    public String getEmail(String token) {
+        return getClaims(token).get("email", String.class);
+    }
+
+    // role 추출
+    public UserRole getRole(String token) {
+        return UserRole.valueOf(getClaims(token).get("role", String.class));
     }
 }
