@@ -28,4 +28,12 @@ public class PointLog extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private PointLogStatus status;
+
+    public static PointLog byCharge(Long pointId, BigDecimal amount) {
+        PointLog pointLog = new PointLog();
+        pointLog.pointId = pointId;
+        pointLog.amount = amount;
+        pointLog.status = PointLogStatus.CHARGE;
+        return pointLog;
+    }
 }
