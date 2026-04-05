@@ -2,7 +2,9 @@ package com.kcfcoffeeshop.domain.menu.controller;
 
 import com.kcfcoffeeshop.common.dto.BaseResponse;
 import com.kcfcoffeeshop.common.dto.PageResponse;
+import com.kcfcoffeeshop.domain.menu.dto.response.MenuBestResponse;
 import com.kcfcoffeeshop.domain.menu.dto.response.MenuListResponse;
+import com.kcfcoffeeshop.domain.menu.service.MenuRankingService;
 import com.kcfcoffeeshop.domain.menu.service.MenuService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -22,6 +24,7 @@ import java.util.List;
 public class MenuController {
 
     private final MenuService menuService;
+    private final MenuRankingService menuRankingService;
 
     @GetMapping
     public ResponseEntity<BaseResponse<PageResponse<MenuListResponse>>> getMenuList(
@@ -31,6 +34,13 @@ public class MenuController {
         Pageable pageable = PageRequest.of(page, size);
         return ResponseEntity.status(HttpStatus.OK).body(
                 BaseResponse.success(HttpStatus.OK, "메뉴 목록 조회 성공", menuService.getMenuList(pageable))
+        );
+    }
+
+    @GetMapping("/best")
+    public ResponseEntity<BaseResponse<List<MenuBestResponse>>> getBestMenu() {
+        return ResponseEntity.status(HttpStatus.OK).body(
+                BaseResponse.success(HttpStatus.OK, "인기 메뉴 목록 조회 성공", menuRankingService.getBestMenu())
         );
     }
 }
