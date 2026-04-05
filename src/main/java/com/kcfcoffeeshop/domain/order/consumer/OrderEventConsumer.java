@@ -1,6 +1,7 @@
 package com.kcfcoffeeshop.domain.order.consumer;
 
 import com.kcfcoffeeshop.common.config.kafka.KafkaConstants;
+import com.kcfcoffeeshop.domain.menu.service.MenuRankingService;
 import com.kcfcoffeeshop.domain.order.dto.kafka.OrderCompleteEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +16,7 @@ import tools.jackson.databind.ObjectMapper;
 public class OrderEventConsumer {
 
     private final ObjectMapper objectMapper;
+    private final MenuRankingService menuRankingService;
 
     @KafkaListener(
             topics = KafkaConstants.ORDER_COMPLETE_TOPIC,
@@ -25,6 +27,7 @@ public class OrderEventConsumer {
         // checked exception은 DLT 처리
         OrderCompleteEvent event = objectMapper.readValue(message, new TypeReference<>() {});
         log.info("Kafka 주문 성공 이벤트 수신 성공 : {}", event);
-        // 메뉴 랭킹 서비스 호출하여 랭킹 증가 메서드 호출
+        // 메뉴 랭킹 업데이트
+        menuRankingService.increaseMenuRanking(event);
     }
 }
