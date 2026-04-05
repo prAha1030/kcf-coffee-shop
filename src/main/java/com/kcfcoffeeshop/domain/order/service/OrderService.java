@@ -62,8 +62,8 @@ public class OrderService {
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         // 분산 락 획득
         String key = ORDER_LOCK_PREFIX + userId;
-        Boolean locked = redisTemplate.opsForValue().setIfAbsent(key, "locked", 60, TimeUnit.SECONDS);
-        if (Boolean.FALSE.equals(locked)) {
+        Boolean isAcquired = redisTemplate.opsForValue().setIfAbsent(key, "locked", 60, TimeUnit.SECONDS);
+        if (Boolean.FALSE.equals(isAcquired)) {
             throw new BusinessException(OrderErrorCode.ERR_LOCK_FAIL);
         }
         try {
