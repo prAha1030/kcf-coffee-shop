@@ -31,4 +31,17 @@ public class Order extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private OrderStatus status;
+
+    public static Order create(Long userId, String orderNumber, BigDecimal totalPrice) {
+        Order order = new Order();
+        order.userId = userId;
+        order.orderNumber = orderNumber;
+        order.totalPrice = totalPrice;
+        order.status = OrderStatus.PENDING;
+        return order;
+    }
+
+    public void complete() {
+        this.status = OrderStatus.SUCCESS;
+    }
 }

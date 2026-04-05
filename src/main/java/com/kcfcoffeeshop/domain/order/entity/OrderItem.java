@@ -1,6 +1,7 @@
 package com.kcfcoffeeshop.domain.order.entity;
 
 import com.kcfcoffeeshop.common.entity.BaseEntity;
+import com.kcfcoffeeshop.domain.menu.entity.Menu;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -32,4 +33,14 @@ public class OrderItem extends BaseEntity {
 
     @Column(nullable = false)
     private int quantity;
+
+    public static OrderItem create(Long orderId, Menu menu, int quantity) {
+        OrderItem orderItem = new OrderItem();
+        orderItem.orderId = orderId;
+        orderItem.menuId = menu.getId();
+        orderItem.name = menu.getName();
+        orderItem.price = menu.getPrice();
+        orderItem.quantity = quantity;
+        return orderItem;
+    }
 }

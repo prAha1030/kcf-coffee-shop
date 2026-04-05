@@ -12,6 +12,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+
 @Service
 @RequiredArgsConstructor
 public class PointService {
@@ -31,5 +33,22 @@ public class PointService {
         pointLogRepository.save(pointLog);
 
         return PointChargeResponse.from(point);
+    }
+
+    @Transactional
+    public BigDecimal deductPoint(Long userId, BigDecimal amount) {
+        // 포인트 차감
+        Point point = pointRepository.findByUserId(userId).orElseThrow(
+                () -> new BusinessException(PointErrorCode.ERR_NOT_FOUND)
+        );
+        if (point.getBalance().compareTo(amount) < 0) {
+            throw new BusinessException(PointErrorCode.ERR_INSUFFICIENT_BALANCE);
+        }
+        point.deduct(amount);
+        // 포인트 이력 생성 및 DB 저장
+        PointLog pointLog = PointLog.byPayment(point.getId(), amount);
+        pointLogRepository.save(pointLog);
+
+        return point.getBalance();
     }
 }

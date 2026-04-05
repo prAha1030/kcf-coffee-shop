@@ -38,4 +38,18 @@ public class Payment extends BaseEntity {
     private String refundReason;
 
     private LocalDateTime refundedAt;
+
+    public static Payment create(Long orderId, String paymentNumber, BigDecimal totalAmount) {
+        Payment payment = new Payment();
+        payment.orderId = orderId;
+        payment.paymentNumber = paymentNumber;
+        payment.totalAmount = totalAmount;
+        payment.status = PaymentStatus.PENDING;
+        return payment;
+    }
+
+    public void complete() {
+        this.status = PaymentStatus.SUCCESS;
+        this.paidAt = LocalDateTime.now();
+    }
 }
