@@ -34,10 +34,8 @@ public class KafkaProducerConfig {
         props.put(ProducerConfig.PARTITIONER_CLASS_CONFIG, RoundRobinPartitioner.class.getName());
         // producer 멱등성 (활성화 시 ack = all)
         props.put(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, true);
-        // 재시도 (횟수, 간격, 전체 타임아웃)
-        props.put(ProducerConfig.RETRIES_CONFIG, 3); // 3회
-        props.put(ProducerConfig.RETRY_BACKOFF_MS_CONFIG, 1000); // 1초
-        props.put(ProducerConfig.DELIVERY_TIMEOUT_MS_CONFIG, 30000); // 30초
+        // 재시도 설정 (전체 타임아웃)
+        props.put(ProducerConfig.DELIVERY_TIMEOUT_MS_CONFIG, 60000); // 60초
 
         return new DefaultKafkaProducerFactory<>(props);
     }
