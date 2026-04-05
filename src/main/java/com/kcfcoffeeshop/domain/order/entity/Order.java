@@ -40,4 +40,8 @@ public class Order extends BaseEntity {
         order.status = OrderStatus.PENDING;
         return order;
     }
+
+    public void complete() {
+        this.status = OrderStatus.SUCCESS;
+    }
 }
