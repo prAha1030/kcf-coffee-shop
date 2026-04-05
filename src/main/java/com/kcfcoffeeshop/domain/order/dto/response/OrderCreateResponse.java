@@ -1,8 +1,6 @@
 package com.kcfcoffeeshop.domain.order.dto.response;
 
-import com.kcfcoffeeshop.domain.order.entity.Order;
 import com.kcfcoffeeshop.domain.payment.entity.Payment;
-import com.kcfcoffeeshop.domain.point.entity.Point;
 
 import java.math.BigDecimal;
 
@@ -12,12 +10,12 @@ public record OrderCreateResponse(
         BigDecimal totalAmount,
         BigDecimal balance
 ) {
-    public static OrderCreateResponse from(Order order, Payment payment, Point point) {
+    public static OrderCreateResponse from(String orderNumber, Payment payment, BigDecimal balance) {
         return new OrderCreateResponse(
-                order.getOrderNumber(),
+                orderNumber,
                 payment.getPaymentNumber(),
                 payment.getTotalAmount(),
-                point.getBalance()
+                balance
         );
     }
 }
