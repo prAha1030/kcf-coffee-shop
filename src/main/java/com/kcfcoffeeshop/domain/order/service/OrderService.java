@@ -4,11 +4,13 @@ import com.kcfcoffeeshop.common.exception.BusinessException;
 import com.kcfcoffeeshop.domain.menu.entity.Menu;
 import com.kcfcoffeeshop.domain.menu.enums.MenuErrorCode;
 import com.kcfcoffeeshop.domain.menu.repository.MenuRepository;
+import com.kcfcoffeeshop.domain.order.dto.kafka.OrderCompleteEvent;
 import com.kcfcoffeeshop.domain.order.dto.request.OrderCreateRequest;
 import com.kcfcoffeeshop.domain.order.dto.response.OrderCreateResponse;
 import com.kcfcoffeeshop.domain.order.entity.Order;
 import com.kcfcoffeeshop.domain.order.entity.OrderItem;
 import com.kcfcoffeeshop.domain.order.enums.OrderErrorCode;
+import com.kcfcoffeeshop.domain.order.producer.OrderEventProducer;
 import com.kcfcoffeeshop.domain.order.repository.OrderItemRepository;
 import com.kcfcoffeeshop.domain.order.repository.OrderRepository;
 import com.kcfcoffeeshop.domain.payment.entity.Payment;
@@ -41,6 +43,7 @@ public class OrderService {
     private final OrderItemRepository orderItemRepository;
     private final PaymentRepository paymentRepository;
     private final RedisTemplate<String, String> redisTemplate;
+    private final OrderEventProducer orderEventProducer;
 
     @Transactional
     public OrderCreateResponse createOrder(OrderCreateRequest request, Long userId) {
@@ -88,8 +91,13 @@ public class OrderService {
             // 주문 + 결제 성공!
             savedOrder.complete();
             savedPayment.complete();
-            // TODO Kafka 주문 이벤트 전송
-            // return
+            // Kafka 주문 이벤트 전송
+            orderItems.forEach(
+                    orderItem -> orderEventProducer.sendOrderCompleteEvent(
+                            OrderCompleteEvent.from(savedOrder.getOrderNumber(), orderItem)
+                    )
+            );
+
             return OrderCreateResponse.from(savedOrder.getOrderNumber(), savedPayment, balance);
         } finally {
             // 락 해제
