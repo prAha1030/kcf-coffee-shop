@@ -1,7 +1,7 @@
 package com.kcfcoffeeshop.domain.menu.service;
 
 import com.kcfcoffeeshop.common.dto.PageResponse;
-import com.kcfcoffeeshop.domain.menu.dto.response.MenuListGetResponse;
+import com.kcfcoffeeshop.domain.menu.dto.response.MenuListResponse;
 import com.kcfcoffeeshop.domain.menu.repository.MenuRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,7 +27,7 @@ public class MenuService {
     private final ObjectMapper objectMapper;
 
     @Transactional(readOnly = true)
-    public PageResponse<MenuListGetResponse> getMenuList(Pageable pageable) {
+    public PageResponse<MenuListResponse> getMenuList(Pageable pageable) {
         String key = MENU_CACHE_PREFIX + "page:" + pageable.getPageNumber() + ":size:" + pageable.getPageSize();
 
         try {
@@ -42,9 +42,9 @@ public class MenuService {
         }
 
         // 캐시 미스 : DB 조회
-        Page<MenuListGetResponse> page = menuRepository.findALLByDeletedAtIsNull(pageable)
-                .map(MenuListGetResponse::from);
-        PageResponse<MenuListGetResponse> pageResponse = PageResponse.from(page);
+        Page<MenuListResponse> page = menuRepository.findALLByDeletedAtIsNull(pageable)
+                .map(MenuListResponse::from);
+        PageResponse<MenuListResponse> pageResponse = PageResponse.from(page);
 
         try {
             // 캐시 저장

@@ -2,7 +2,9 @@ package com.kcfcoffeeshop.domain.menu.controller;
 
 import com.kcfcoffeeshop.common.dto.BaseResponse;
 import com.kcfcoffeeshop.common.dto.PageResponse;
-import com.kcfcoffeeshop.domain.menu.dto.response.MenuListGetResponse;
+import com.kcfcoffeeshop.domain.menu.dto.response.MenuBestResponse;
+import com.kcfcoffeeshop.domain.menu.dto.response.MenuListResponse;
+import com.kcfcoffeeshop.domain.menu.service.MenuRankingService;
 import com.kcfcoffeeshop.domain.menu.service.MenuService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -14,21 +16,31 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/menus")
 public class MenuController {
 
     private final MenuService menuService;
+    private final MenuRankingService menuRankingService;
 
     @GetMapping
-    public ResponseEntity<BaseResponse<PageResponse<MenuListGetResponse>>> getMenuList(
+    public ResponseEntity<BaseResponse<PageResponse<MenuListResponse>>> getMenuList(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
         Pageable pageable = PageRequest.of(page, size);
         return ResponseEntity.status(HttpStatus.OK).body(
                 BaseResponse.success(HttpStatus.OK, "메뉴 목록 조회 성공", menuService.getMenuList(pageable))
+        );
+    }
+
+    @GetMapping("/best")
+    public ResponseEntity<BaseResponse<List<MenuBestResponse>>> getBestMenu() {
+        return ResponseEntity.status(HttpStatus.OK).body(
+                BaseResponse.success(HttpStatus.OK, "인기 메뉴 목록 조회 성공", menuRankingService.getBestMenu())
         );
     }
 }
