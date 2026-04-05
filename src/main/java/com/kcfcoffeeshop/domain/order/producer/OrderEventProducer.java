@@ -1,5 +1,6 @@
 package com.kcfcoffeeshop.domain.order.producer;
 
+import com.kcfcoffeeshop.common.config.kafka.KafkaConstants;
 import com.kcfcoffeeshop.domain.order.dto.kafka.OrderCompleteEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -12,15 +13,13 @@ import tools.jackson.databind.ObjectMapper;
 @RequiredArgsConstructor
 public class OrderEventProducer {
 
-    private static final String COMPLETE_TOPIC = "order.complete";
-
     private final KafkaTemplate<String, String> stringKafkaTemplate;
     private final ObjectMapper objectMapper;
 
     public void sendOrderCompleteEvent(OrderCompleteEvent event) {
         try {
             String message = objectMapper.writeValueAsString(event);
-            stringKafkaTemplate.send(COMPLETE_TOPIC, message)
+            stringKafkaTemplate.send(KafkaConstants.ORDER_COMPLETE_TOPIC, message)
                     .whenComplete((result, ex) -> {
                         if (ex != null) {
                             log.error("Kafka 주문 성공 이벤트 전송 실패 : {}", ex.getMessage());

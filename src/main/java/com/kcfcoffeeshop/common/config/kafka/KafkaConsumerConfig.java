@@ -32,7 +32,7 @@ public class KafkaConsumerConfig {
         // 서버 위치
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaProperties.bootstrapServers());
         // consumer group id
-        props.put(ConsumerConfig.GROUP_ID_CONFIG, "order-group");
+        props.put(ConsumerConfig.GROUP_ID_CONFIG, KafkaConstants.ORDER_GROUP_ID);
         // key, value 문자열로 직렬화
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
