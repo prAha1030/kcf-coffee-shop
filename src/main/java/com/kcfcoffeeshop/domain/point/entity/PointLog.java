@@ -36,4 +36,12 @@ public class PointLog extends BaseEntity {
         pointLog.status = PointLogStatus.CHARGE;
         return pointLog;
     }
+
+    public static PointLog byPayment(Long pointId, BigDecimal amount) {
+        PointLog pointLog = new PointLog();
+        pointLog.pointId = pointId;
+        pointLog.amount = amount;
+        pointLog.status = PointLogStatus.PAYMENT;
+        return pointLog;
+    }
 }
