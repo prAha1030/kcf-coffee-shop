@@ -47,4 +47,9 @@ public class Payment extends BaseEntity {
         payment.status = PaymentStatus.PENDING;
         return payment;
     }
+
+    public void complete() {
+        this.status = PaymentStatus.SUCCESS;
+        this.paidAt = LocalDateTime.now();
+    }
 }
