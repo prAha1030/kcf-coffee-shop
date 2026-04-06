@@ -1,5 +1,6 @@
 package com.kcfcoffeeshop.domain.user.service;
 
+import com.kcfcoffeeshop.common.exception.BusinessException;
 import com.kcfcoffeeshop.domain.point.repository.PointRepository;
 import com.kcfcoffeeshop.domain.user.dto.request.UserSignupRequest;
 import com.kcfcoffeeshop.domain.user.dto.response.UserSignupResponse;
@@ -55,6 +56,19 @@ class UserServiceTest {
             assertNotNull(response);
             verify(userRepository).save(any());
             verify(pointRepository).save(any());
+        }
+
+        @Test
+        @DisplayName("이메일 중복 시 예외 발생")
+        void signup_duplicated_email() {
+            // given
+            UserSignupRequest request = new UserSignupRequest(
+                    "테스트", "test@test.com", "password123!", "010-1234-5678", "서울시"
+            );
+            when(userRepository.existsByEmail(request.email())).thenReturn(true);
+
+            // when & then
+            assertThrows(BusinessException.class, () -> userService.userSignup(request));
         }
     }
 }
