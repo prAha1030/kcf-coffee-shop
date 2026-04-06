@@ -81,4 +81,25 @@ class PointServiceTest {
             verify(pointLogRepository, never()).save(any());
         }
     }
+
+    @Nested
+    @DisplayName("포인트 차감")
+    class Deduct {
+
+        @Test
+        @DisplayName("정상 차감")
+        void deduct_success() {
+            // given
+            Point point = Point.create(1L);
+            point.charge(BigDecimal.valueOf(10000));
+            when(pointRepository.findByUserId(1L)).thenReturn(Optional.of(point));
+
+            // when
+            BigDecimal balance = pointService.deductPoint(1L, BigDecimal.valueOf(5000));
+
+            // then
+            assertEquals(BigDecimal.valueOf(5000), balance);
+            verify(pointLogRepository).save(any());
+        }
+    }
 }
