@@ -22,8 +22,7 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class PointServiceTest {
@@ -61,6 +60,25 @@ class PointServiceTest {
             // then
             assertEquals(BigDecimal.valueOf(10000), response.balance());
             verify(pointLogRepository).save(any());
+        }
+
+        @Test
+        @DisplayName("중복 요청 시 기존 결과 반환")
+        void charge_duplicate_request() {
+            // given
+            PointChargeRequest request = new PointChargeRequest(BigDecimal.valueOf(10000));
+            String idempotencyKey = UUID.randomUUID().toString();
+            Point point = Point.create(1L);
+            when(redisTemplate.opsForValue()).thenReturn(valueOperations);
+            when(valueOperations.setIfAbsent(any(), any(), anyLong(), any())).thenReturn(false);
+            when(pointRepository.findByUserId(1L)).thenReturn(Optional.of(point));
+
+            // when
+            PointChargeResponse response = pointService.chargePoint(request, 1L, idempotencyKey);
+
+            // then
+            assertEquals(BigDecimal.ZERO, response.balance());
+            verify(pointLogRepository, never()).save(any());
         }
     }
 }
