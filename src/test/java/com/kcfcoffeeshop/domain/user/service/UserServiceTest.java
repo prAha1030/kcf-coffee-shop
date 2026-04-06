@@ -107,5 +107,16 @@ class UserServiceTest {
             assertNotNull(response);
             assertEquals("accessToken", response.accessToken());
         }
+
+        @Test
+        @DisplayName("존재하지 않는 이메일로 로그인 시 예외 발생")
+        void login_user_not_found() {
+            // given
+            UserLoginRequest request = new UserLoginRequest("test@test.com", "password123!");
+            when(userRepository.findByEmail(request.email())).thenReturn(Optional.empty());
+
+            // when & then
+            assertThrows(BusinessException.class, () -> userService.userLogin(request));
+        }
     }
 }
