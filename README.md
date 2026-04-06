@@ -279,6 +279,7 @@ jwt:
 | 브랜치 | 설명 |
 |---|---|
 | `main` | 최종 배포 브랜치 |
+| `dev` | 개발 통합 브랜치 |
 | `feature/user-signup` | 회원가입 |
 | `feature/user-login` | 로그인 |
 | `feature/menu-list` | 메뉴 목록 조회 + Redis 캐시 |
