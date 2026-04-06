@@ -17,6 +17,8 @@ import com.kcfcoffeeshop.domain.payment.entity.Payment;
 import com.kcfcoffeeshop.domain.payment.repository.PaymentRepository;
 import com.kcfcoffeeshop.domain.point.service.PointService;
 import lombok.RequiredArgsConstructor;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,6 +45,7 @@ public class OrderService {
     private final OrderItemRepository orderItemRepository;
     private final PaymentRepository paymentRepository;
     private final RedisTemplate<String, String> redisTemplate;
+    private final RedissonClient redissonClient;
     private final OrderEventProducer orderEventProducer;
 
     @Transactional
@@ -65,8 +68,14 @@ public class OrderService {
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         // 분산 락 획득
         String key = ORDER_LOCK_PREFIX + userId;
-        Boolean isAcquired = redisTemplate.opsForValue().setIfAbsent(key, "locked", 60, TimeUnit.SECONDS);
-        if (Boolean.FALSE.equals(isAcquired)) {
+        RLock lock = redissonClient.getLock(key);
+        try {
+            boolean isAcquired = lock.tryLock(0, 60, TimeUnit.SECONDS);
+            if (!isAcquired) {
+                throw new BusinessException(OrderErrorCode.ERR_LOCK_FAIL);
+            }
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
             throw new BusinessException(OrderErrorCode.ERR_LOCK_FAIL);
         }
         try {
@@ -100,8 +109,10 @@ public class OrderService {
 
             return OrderCreateResponse.from(savedOrder.getOrderNumber(), savedPayment, balance);
         } finally {
-            // 락 해제
-            redisTemplate.delete(key);
+            // 락 해제 (락을 획득했을 경우)
+            if (lock.isHeldByCurrentThread()) {
+                lock.unlock();
+            }
         }
     }
 
