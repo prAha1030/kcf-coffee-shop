@@ -9,10 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -24,10 +21,15 @@ public class PointController {
     @PostMapping
     public ResponseEntity<BaseResponse<PointChargeResponse>> chargePoint(
             @Valid @RequestBody PointChargeRequest request,
+            @RequestHeader("Idempotency-Key") String idempotencyKey,
             @AuthenticationPrincipal Long userId
     ) {
         return ResponseEntity.status(HttpStatus.CREATED).body(
-                BaseResponse.success(HttpStatus.CREATED, "포인트 충전 성공", pointService.chargePoint(request, userId))
+                BaseResponse.success(
+                        HttpStatus.CREATED,
+                        "포인트 충전 성공",
+                        pointService.chargePoint(request, userId, idempotencyKey)
+                )
         );
     }
 }
