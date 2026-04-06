@@ -1,5 +1,6 @@
 package com.kcfcoffeeshop.domain.point.service;
 
+import com.kcfcoffeeshop.common.exception.BusinessException;
 import com.kcfcoffeeshop.domain.point.dto.request.PointChargeRequest;
 import com.kcfcoffeeshop.domain.point.dto.response.PointChargeResponse;
 import com.kcfcoffeeshop.domain.point.entity.Point;
@@ -100,6 +101,19 @@ class PointServiceTest {
             // then
             assertEquals(BigDecimal.valueOf(5000), balance);
             verify(pointLogRepository).save(any());
+        }
+
+        @Test
+        @DisplayName("잔액 부족 시 예외 발생")
+        void deduct_insufficient_balance() {
+            // given
+            Point point = Point.create(1L);
+            point.charge(BigDecimal.valueOf(1000));
+            when(pointRepository.findByUserId(1L)).thenReturn(Optional.of(point));
+
+            // when & then
+            assertThrows(BusinessException.class,
+                    () -> pointService.deductPoint(1L, BigDecimal.valueOf(5000)));
         }
     }
 }
