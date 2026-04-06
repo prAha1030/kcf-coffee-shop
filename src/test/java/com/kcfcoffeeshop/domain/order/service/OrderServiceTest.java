@@ -1,5 +1,6 @@
 package com.kcfcoffeeshop.domain.order.service;
 
+import com.kcfcoffeeshop.common.exception.BusinessException;
 import com.kcfcoffeeshop.domain.menu.entity.Menu;
 import com.kcfcoffeeshop.domain.menu.repository.MenuRepository;
 import com.kcfcoffeeshop.domain.order.dto.request.OrderCreateRequest;
@@ -94,6 +95,20 @@ class OrderServiceTest {
             verify(orderRepository).save(any());
             verify(paymentRepository).save(any());
             verify(pointService).deductPoint(any(), any());
+        }
+
+        @Test
+        @DisplayName("존재하지 않는 메뉴 주문 시 예외 발생")
+        void createOrder_menu_not_found() throws InterruptedException {
+            // given
+            OrderCreateRequest request = new OrderCreateRequest(List.of(
+                    new OrderCreateRequest.OrderItemCreateRequest(999L, 2)
+            ));
+            when(menuRepository.findAllById(any())).thenReturn(List.of());
+
+            // when & then
+            assertThrows(BusinessException.class,
+                    () -> orderService.createOrder(request, 1L));
         }
     }
 }
