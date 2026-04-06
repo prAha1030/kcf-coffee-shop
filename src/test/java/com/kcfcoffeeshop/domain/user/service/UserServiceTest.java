@@ -118,5 +118,18 @@ class UserServiceTest {
             // when & then
             assertThrows(BusinessException.class, () -> userService.userLogin(request));
         }
+
+        @Test
+        @DisplayName("비밀번호 불일치 시 예외 발생")
+        void login_invalid_password() {
+            // given
+            UserLoginRequest request = new UserLoginRequest("test@test.com", "wrongPassword");
+            User user = mock(User.class);
+            when(userRepository.findByEmail(request.email())).thenReturn(Optional.of(user));
+            when(passwordEncoder.matches(request.password(), user.getPassword())).thenReturn(false);
+
+            // when & then
+            assertThrows(BusinessException.class, () -> userService.userLogin(request));
+        }
     }
 }
