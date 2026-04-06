@@ -1,8 +1,11 @@
 package com.kcfcoffeeshop.domain.user.service;
 
+import com.kcfcoffeeshop.common.config.security.JwtUtil;
 import com.kcfcoffeeshop.common.exception.BusinessException;
 import com.kcfcoffeeshop.domain.point.repository.PointRepository;
+import com.kcfcoffeeshop.domain.user.dto.request.UserLoginRequest;
 import com.kcfcoffeeshop.domain.user.dto.request.UserSignupRequest;
+import com.kcfcoffeeshop.domain.user.dto.response.UserLoginResponse;
 import com.kcfcoffeeshop.domain.user.dto.response.UserSignupResponse;
 import com.kcfcoffeeshop.domain.user.entity.User;
 import com.kcfcoffeeshop.domain.user.repository.UserRepository;
@@ -13,12 +16,15 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
@@ -29,6 +35,12 @@ class UserServiceTest {
     private PointRepository pointRepository;
     @Mock
     private PasswordEncoder passwordEncoder;
+    @Mock
+    private JwtUtil jwtUtil;
+    @Mock
+    private RedisTemplate<String, String> redisTemplate;
+    @Mock
+    private ValueOperations<String, String> valueOperations;
 
     @InjectMocks
     private UserService userService;
@@ -69,6 +81,31 @@ class UserServiceTest {
 
             // when & then
             assertThrows(BusinessException.class, () -> userService.userSignup(request));
+        }
+    }
+
+    @Nested
+    @DisplayName("로그인")
+    class Login {
+
+        @Test
+        @DisplayName("정상 로그인")
+        void login_success() {
+            // given
+            UserLoginRequest request = new UserLoginRequest("test@test.com", "password123!");
+            User user = mock(User.class);
+            when(userRepository.findByEmail(request.email())).thenReturn(Optional.of(user));
+            when(passwordEncoder.matches(request.password(), user.getPassword())).thenReturn(true);
+            when(jwtUtil.createAccessToken(any(), any(), any())).thenReturn("accessToken");
+            when(jwtUtil.createRefreshToken()).thenReturn("refreshToken");
+            when(redisTemplate.opsForValue()).thenReturn(valueOperations);
+
+            // when
+            UserLoginResponse response = userService.userLogin(request);
+
+            // then
+            assertNotNull(response);
+            assertEquals("accessToken", response.accessToken());
         }
     }
 }
