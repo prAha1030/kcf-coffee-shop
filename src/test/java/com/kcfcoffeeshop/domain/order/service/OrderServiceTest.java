@@ -110,5 +110,24 @@ class OrderServiceTest {
             assertThrows(BusinessException.class,
                     () -> orderService.createOrder(request, 1L));
         }
+
+        @Test
+        @DisplayName("락 획득 실패 시 예외 발생")
+        void createOrder_lock_fail() throws InterruptedException {
+            // given
+            OrderCreateRequest request = new OrderCreateRequest(List.of(
+                    new OrderCreateRequest.OrderItemCreateRequest(1L, 2)
+            ));
+            Menu menu = mock(Menu.class);
+            when(menu.getId()).thenReturn(1L);
+            when(menu.getPrice()).thenReturn(BigDecimal.valueOf(4500));
+            when(menuRepository.findAllById(any())).thenReturn(List.of(menu));
+            when(redissonClient.getLock(anyString())).thenReturn(rLock);
+            when(rLock.tryLock(anyLong(), anyLong(), any())).thenReturn(false);
+
+            // when & then
+            assertThrows(BusinessException.class,
+                    () -> orderService.createOrder(request, 1L));
+        }
     }
 }
