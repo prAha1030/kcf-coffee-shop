@@ -75,6 +75,7 @@ dependencies {
 
     // Test - h2
     testImplementation 'com.h2database:h2'
+    // Test - redis
     testImplementation 'com.github.codemonstur:embedded-redis:1.4.3'
 }
 
